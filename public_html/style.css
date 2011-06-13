@@ -1,0 +1,267 @@
+/*************************************************************
+MDK.IM
+FILE: /style.css
+*************************************************************/
+
+html { }
+body {font: 80% Helvetica, Arial, sans-serif; }
+
+
+
+/*************************************************************
+TYPOGRAPHY & GENERAL STYLES
+*************************************************************/
+
+h1,h2,h3,h4,h5 {color: #AAA; margin-bottom: 10px; }
+h1 {font-size: 5em; }
+h2 {font-size: 3em; }
+h3 {font-size: 2em; }
+h4 {font-size: 1.5em; }
+h5 {font-size: 1em; }
+
+.colorful {color: #D761FF; }
+.centered {text-align: center; }
+.gigantic {font-size: 200px; }
+
+a {padding: 0 .2em 0 .2em; }
+/* universal */
+a:link, a:visited {color: #000; text-decoration: none; background: #F1C7FF; }
+a:hover {background: #E494FF; }
+a:active {color: #000; text-decoration: none; background: #F1C7FF; }
+a:focus, a {-moz-outline-style: none; outline: none;}
+
+
+
+/* to-do projects */
+a.todo:link, a.todo:visited {color: #000; text-decoration: none; background: #94AFFF; }
+a.todo:hover {background: #6188FF; }
+a.todo:active {color: #000; text-decoration: none; background: #94AFFF; }
+
+strong {font-weight: bold; }
+em {font-style: italic; }
+del {text-decoration: line-through; }
+u {text-decoration: underline; }
+
+ul {padding: 10px 0 0 30px; list-style-type: disc; }
+ol {padding: 10px 0 0 30px; list-style-type: decimal; }
+li {padding-bottom: 10px; }
+
+p {margin-bottom: 10px; }
+
+span.highlight {background: #FFEE55; padding: 0 .2em; }
+.light {color: #AAA; }
+
+table.grid td {
+	padding: 0 10px 5px 0;
+}
+
+/*************************************************************
+MAIN LAYOUT STYLES
+*************************************************************/
+
+#wrapper {
+	width: 1000px;
+	margin: 0 auto;
+}
+
+/************************************
+HEADER
+************************************/
+
+#header {
+	padding: 30px 0;
+	text-align: center;
+}
+
+#header h1 {
+	color: #000;
+}
+
+/************************************
+MAIN CONTENT
+************************************/
+
+#main {
+	padding-bottom: 50px;
+	margin-bottom: 10px;
+	overflow: hidden;
+	border-bottom: 1px dotted #AAA;
+}
+
+.main-half {
+	width: 480px;
+	margin-right: 40px;
+	float: left;
+}
+
+.main-half:last-child {
+	margin: 0;
+}
+
+.main-half .contents {
+	margin-top: 10px;
+}
+
+.main-header {
+	width: 100%;
+	border-bottom: 1px dotted #AAA;
+}
+
+.main-header h2 {
+	color: #000;
+}
+
+.main-header h2,
+.main-header h5 {
+	display: inline;
+}
+
+.main-header h5.centered {
+	display: block;
+	text-align: center;
+}
+
+.three-container {
+	width: 100%;
+	overflow: hidden;
+}
+
+.main-third {
+	width: 320px;
+	float: left;
+	margin: 10px 20px 0 0;
+}
+
+.last {
+	margin-right: 0;
+}
+
+.main-whole {
+	width: 100%;
+	float: left;
+	margin: 10px 0 20px 0;
+}
+
+/************************************
+FORM STYLES
+************************************/
+
+.required {
+	color: #D761FF;
+}
+
+.row {
+	padding: 3px;
+	margin-bottom: 10px;
+	overflow: hidden;
+}
+
+.secondary {
+																			/* background: #94AFFF; */
+}
+
+.row label {
+	display: block;
+	margin-bottom: 3px;
+}
+
+.row .radio {
+	display: block;
+	float: left;
+	padding-top: 3px;
+}
+
+.row .radio label {
+	width: auto;
+	padding: 0;
+	display: inline;
+	float: none;
+	text-align: left;
+}
+
+input.colorful-border {
+	border: 1px solid #D761FF !important;
+}
+
+input:invalid {
+	/* -moz-box-shadow: none; */
+}
+
+.row input[type="text"] {
+	width: 200px;
+	padding: 3px;
+	border: 1px solid #CCC;
+	
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+}
+
+.row input[type="url"] {
+	width: 400px;
+	padding: 3px;
+	border: 1px solid #CCC;
+	
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+}
+
+.row input[type="text"]:focus,
+.row input[type="url"]:focus {
+	border: 1px solid #94AFFF;
+	outline: none;
+}
+
+.row input[type="submit"],
+.row .input-column {
+	margin: 10px 0 0 176px;
+}
+
+.row .description {
+	color: #AAA;
+	font-style: italic;
+}
+
+/************************************
+FOOTER
+************************************/
+
+#footer {
+	text-align: center;
+}
+
+#header ul,
+#footer ul {
+	list-style-type: none;
+	padding: 0;
+}
+
+#header ul li,
+#footer ul li {
+	padding-right: 10px;
+	display: inline;
+}
+
+#header ul li:last-child,
+#footer ul li:last-child {
+	padding-right: 0;
+}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
