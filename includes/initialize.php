@@ -6,7 +6,7 @@
 // DIRECTORY_SEPARATOR is a PHP pre-defined constant
 // {\ for Windows, / for Unix)
 defined('DS') ? null : define('DS', DIRECTORY_SEPARATOR);
-defined('SITE_ROOT') ? null : define('SITE_ROOT', 'C:'.DS.'wamp'.DS.'www'.DS.'github'.DS.'URL-Shortener');
+defined('SITE_ROOT') ? null : define('SITE_ROOT', 'C:'.DS.'wamp'.DS.'www'.DS.'mdk.im'); // [CHANGEME]
 defined('INC_PATH') ? null : define('INC_PATH', SITE_ROOT.DS.'includes');
 defined('CLASS_PATH') ? null : define('CLASS_PATH', INC_PATH.DS.'classes');
 

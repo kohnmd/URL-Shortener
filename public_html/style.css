@@ -22,6 +22,8 @@ h5 {font-size: 1em; }
 .colorful {color: #D761FF; }
 .centered {text-align: center; }
 .gigantic {font-size: 200px; }
+.dark {color: #000 !important; }
+.light {color: #AAA; }
 
 a {padding: 0 .2em 0 .2em; }
 /* universal */

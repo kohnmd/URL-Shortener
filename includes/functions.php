@@ -4,7 +4,7 @@
 // DIRECTORY PATHS
 //*************************************************************
 function get_directory_path() {
-	return "/github/URL-Shortener/public_html"; // [CHANGEME] //
+	return "http://localhost/mdk.im/public_html"; // [CHANGEME]
 }
 
 function directory_path() {

@@ -17,8 +17,8 @@ class Shortener extends DatabaseObject {
 	function __construct() {
 		$this->short_url = static::get_short_url();
 		$this->redirect_url = static::get_redirect_url();
-		if($this->short_url) $this->is_unique = TRUE;
-		else $this->is_unique = FALSE;
+		if($this->short_url) { $this->is_unique = TRUE; }
+		else { $this->is_unique = FALSE; }
 		$this->date_created = date('Y-m-d G:i:s',time());
 	}
 	
@@ -33,11 +33,11 @@ class Shortener extends DatabaseObject {
 		
 		$sql = "";
 		if(isset($args_array['id']) && !empty($args_array['id'])) {
-			$sql = "SELECT * FROM ".static::$table_name." WHERE id = '".$args_array['id']."' LIMIT 1";
+			$sql = "SELECT * FROM ".static::$table_name." WHERE id = '".$args_array['id']."' LIMIT 0,1";
 		} elseif(isset($args_array['short_url']) && !empty($args_array['short_url'])) {
-			$sql = "SELECT * FROM ".static::$table_name." WHERE short_url = '".$args_array['short_url']."' LIMIT 1";
+			$sql = "SELECT * FROM ".static::$table_name." WHERE short_url = '".$args_array['short_url']."' LIMIT 0,1";
 		} elseif(isset($args_array['redirect_url']) && !empty($args_array['redirect_url'])) {
-			$sql = "SELECT * FROM ".static::$table_name." WHERE redirect_url = '".$args_array['redirect_url']."' LIMIT 1";
+			$sql = "SELECT * FROM ".static::$table_name." WHERE redirect_url = '".$args_array['redirect_url']."' LIMIT 0,1";
 		}
 		
 		if($sql) {
@@ -47,6 +47,7 @@ class Shortener extends DatabaseObject {
 				return $shortener_object;
 			}
 		}
+		
 		return false;
 	}
 	
@@ -67,7 +68,9 @@ class Shortener extends DatabaseObject {
 		} elseif(isset($_POST['create_new']) && $_POST['create_new']=='Shorten!' && isset($_POST['short_url']) && trim($_POST['short_url'])!="" ) {
 			// if redirect url is empty and the sql query doesn't return anything,
 			// check if the create_new form was submitted
-			return $database->escape_value($_POST['short_url']);
+			$short_url = $database->escape_value(trim($_POST['short_url']));
+			$short_url = str_replace(' ', '_', $short_url);
+			return urlencode($short_url);
 		}
 		// if all of that failed, return false
 		return FALSE;
@@ -77,24 +80,35 @@ class Shortener extends DatabaseObject {
 		global $database;
 		global $error_message;
 		$redirect_url = "";
-	
+		
 		// first things first, check if the create_new form was submitted
 		if(isset($_POST['create_new']) && $_POST['create_new']=='Shorten!' && isset($_POST['redirect_url']) && trim($_POST['redirect_url'])!="" ) {
 			// if short url is empty and the sql query doesn't return anything,
 			// check if the create_new form was submitted
-			$redirect_url =  $database->escape_value($_POST['redirect_url']);
-		}
-		// if a short_url is not entered and create_new was not submitted,
-		// try getting one from the requested site URL
-		if($short_url=="" && static::get_short_url()) {
-			$short_url = static::get_short_url();
-		}
-		// only search for the redirect_url if a short_url was either
-		// specified explicitly, or was requested in the site URL
-		if($short_url) {
-			$shortener_object = static::get_shortener_object("short_url={$short_url}");
-			if($shortener_object) {
-				$redirect_url = $database->escape_value($shortener_object->redirect_url);
+			$redirect_url = $database->escape_value(trim($_POST['redirect_url']));			
+		
+		} elseif(isset($_GET['short_url']) && trim($_GET['short_url'])!="") {
+			// if short_url is requested in url, then look for redirect_url in database
+			$sql = "SELECT * FROM ".static::$table_name." WHERE short_url = '".$_GET['short_url']."' LIMIT 0,1";
+			$result_set = $database->query($sql);
+			$row = $database->fetch_array($result_set);
+			if(!empty($row)) {
+				$redirect_url = $row[0]['redirect_url'];
+			}
+		} else {
+		
+			// if a short_url is not entered and create_new was not submitted,
+			// try getting one from the requested site URL
+			if($short_url=="" && static::get_short_url()) {
+				$short_url = static::get_short_url();
+			}
+			// only search for the redirect_url if a short_url was either
+			// specified explicitly, or was requested in the site URL
+			if($short_url) {
+				$shortener_object = static::get_shortener_object("short_url={$short_url}");
+				if($shortener_object) {
+					$redirect_url = $database->escape_value($shortener_object->redirect_url);
+				}
 			}
 		}
 		
@@ -104,24 +118,51 @@ class Shortener extends DatabaseObject {
 				$redirect_url = 'http://' . $redirect_url;
 			}
 			
-			
-			
-			
-			
-			return $redirect_url;
+			// check if url is valid
+			if(static::is_valid_url($redirect_url)) {
+				return $redirect_url;
+			}
 		}
 		
 		// if all of that failed, return false
-		$error_message = "Well crap, we could't get a valid redirect URL.";
+		$error_message = "Well crap, we could't get a valid URL to shorten. Are you sure you entered it correctly?";
 		return FALSE;
 	}
 	
+	
+	public static function is_valid_url($url) {
+		
+		// Unfortunately, the below regex doesn't even work for google search urls.
+		/*$regex = "((https?|ftp)\:\/\/)?"; // Scheme
+		$regex .= "([a-z0-9+!*(),;?&=\$_.-]+(\:[a-z0-9+!*(),;?&=\$_.-]+)?@)?"; // User and Pass
+		$regex .= "([a-z0-9-.]*)\.([a-z]{2,3})"; // Host or IP
+		$regex .= "(\:[0-9]{2,5})?"; // Port
+		$regex .= "(\/([a-z0-9+\$_-]\.?)+)*\/?"; // Path
+		$regex .= "(\?[a-z+&\$_.-][a-z0-9;:@&%=+\/\$_.-]*)?"; // GET Query
+		$regex .= "(#[a-z_.-][a-z0-9+\$_.-]*)?"; // Anchor 
+		if(preg_match("/^$regex$/", $url)) {
+			return TRUE;
+		} else {
+			echo $url . "<br />isn't valid<br />";
+			return FALSE;
+		}*/
+		
+		
+		// I cannot find another good url validator.
+		// Therefore, for now, there is no url validation
+		return TRUE;
+		
+	}
+	
+	
 	public static function redirect() {
-		$shortener_object = static::get_shortener_object('short_url='.static::get_short_url());
-		if(is_object($shortener_object)) {
-			$shortener_object->store_stats();
-			echo 'you just got redirected to ' . $redirect_url;
-			//header("Location: ".$redirect_url);
+		if(!isset($_POST['create_new'])) {
+			$shortener_object = static::get_shortener_object('short_url='.static::get_short_url());
+			if(is_object($shortener_object)) {
+				$shortener_object->store_stats();
+				//echo 'you just got redirected to ' . $shortener_object->redirect_url;
+				header("Location: ".$shortener_object->redirect_url);
+			}
 		}
 		return false;
 	}
@@ -132,9 +173,11 @@ class Shortener extends DatabaseObject {
 		$referer = "";
 		if(isset($_SERVER['HTTP_REFERER'])) {
 			$referer = $_SERVER['HTTP_REFERER'];
+		} else {
+			$referer = 'http://mdk.im/';
 		}
 		$sql = "INSERT INTO redirect_stats (
-					id,
+					shortener_id,
 					referer,
 					redirect_time
 				) VALUES ( " .
@@ -142,7 +185,7 @@ class Shortener extends DatabaseObject {
 					$referer ."',
 					NOW()
 				)";
-		//$database->query($sql);
+		$database->query($sql);
 	}
 	
 	protected static function get_next_short_url($short_url="", $offset=1) {
@@ -152,8 +195,6 @@ class Shortener extends DatabaseObject {
 			$short_url = static::get_last_generated_short_url();
 		}
 		$short_url_count = strlen($short_url);
-		
-		//echo $offset . " " . $short_url . " " . $short_url_count . "<br />";
 		
 		// if the index is positive...
 		if($short_url_count >= $offset) {
@@ -185,11 +226,15 @@ class Shortener extends DatabaseObject {
 				LIMIT {$row_num},1";
 		
 		$result = static::find_by_sql($sql);
-		$shortener_object = $result[0];
-		if($shortener_object->is_unique) {
-			$shortener_object->short_url = static::get_last_generated_short_url(++$row_num);
+		if(isset($result[0])) {
+			$shortener_object = $result[0];
+			if($shortener_object->is_unique) {
+				$shortener_object->short_url = static::get_last_generated_short_url(++$row_num);
+			}
+			return $shortener_object->short_url;
+		} else {
+			return FALSE;
 		}
-		return $shortener_object->short_url;
 	}
 	
 	public function save() {
@@ -211,14 +256,13 @@ class Shortener extends DatabaseObject {
 				$error_message = "That short URL already exists in the database. Please select a different short URL, or allow us to generate one for you.";
 				return FALSE;
 			}
-		} 
-		// if not, then save it
-		elseif(parent::save()) {
-			return $this;
+		} elseif($this->redirect_url) {
+			// else if redirect_url exists, save that shit
+			return parent::save();
+		} else {
+			// if everything else went wrong
+			return FALSE;
 		}
-		// if everything fails
-		$error_message = "Some shit went wrong... My bad. :P";
-		return FALSE;
 	}
 
 }

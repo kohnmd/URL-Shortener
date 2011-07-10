@@ -4,36 +4,15 @@
 // On sucess:  will store the redirect stats, then redirect the user
 // 			   to the appropriate redirect_url.
 // On failure: will return false and the script will continue to execute.
-//Shortener::redirect();
+Shortener::redirect();
 
 // CREATE NEW
-if(isset($_POST['create_new']) && $_POST['create_new'] == 'Shorten!') {
+if(isset($_POST['create_new']) && $_POST['create_new'] == 'Shorten!' && strstr($_SERVER['HTTP_REFERER'], 'mdk.im')) { // [CHANGEME] (referer) //
 	$shortener = new Shortener();
-	/*$saved = $shortener->save();
-	pre_print($saved);
+	$saved = $shortener->save();
 	if($error_message!="") {
-		echo $error_message;
-	}*/
-	
-	pre_dump($shortener->redirect_url);
-	
-	
-$regex = "((https?|ftp)\:\/\/)?"; // Scheme
-$regex .= "([a-z0-9+!*(),;?&=\$_.-]+(\:[a-z0-9+!*(),;?&=\$_.-]+)?@)?"; // User and Pass
-$regex .= "([a-z0-9-.]*)\.([a-z]{2,3})"; // Host or IP
-$regex .= "(\:[0-9]{2,5})?"; // Port
-$regex .= "(\/([a-z0-9+\$_-]\.?)+)*\/?"; // Path
-$regex .= "(\?[a-z+&\$_.-][a-z0-9;:@&%=+\/\$_.-]*)?"; // GET Query
-$regex .= "(#[a-z_.-][a-z0-9+\$_.-]*)?"; // Anchor 
-if(preg_match("/^$regex$/", $shortener->redirect_url)) {
-    echo $shortener->redirect_url." = ".'<font color="blue">Valid URL</font>';
-} else {
-    echo $shortener->redirect_url." = ".'<font color="red">Invalid URL</font>';
-}
-	
-	
-	
-	echo $error_message;
+		$new_message = $error_message;
+	}
 }
 
 ?>
@@ -65,25 +44,52 @@ if(preg_match("/^$regex$/", $shortener->redirect_url)) {
 	<div id="main">
 		
 		<div class="main-half">
-			<div class="main-header">
-				<h3>create new</h3>
-				<?php if(isset($message) && !empty($message)) echo '<div class="row"><h5 class="colorful input-column">{ ' . $message . ' }</h5></div>'; ?>
-			</div>
-			<div class="contents">
-				<form method="post" action="/">
+			<?php 
+			// if the form has been submitted and there are no error messages
+			if((!isset($new_message) || empty($new_message)) && isset($_POST['create_new']) && $_POST['create_new']=='Shorten!' && strstr($_SERVER['HTTP_REFERER'], 'mdk.im')) : // [CHANGEME] (referer) //
+			?>
+		
+				<div class="main-header">
+					<h3 class="dark"><?php echo get_directory_path() . '/' . $shortener->short_url; ?></h3>
+				</div>
+				<div class="contents">
 					<div class="row">
-						<label for="redirect_url">url to shorten <span class="required">*</span></label>
-						<input type="text" value="" id="redirect_url" name="redirect_url" maxlength="256" required />
+						<p class="light">redirects to <?php echo htmlentities($shortener->redirect_url); ?></p>
 					</div>
 					<div class="row">
-						<label for="redirect_url">custom short url <span class="description">(leave blank for auto-generated url)</span></label>
-						<span class="description">http://mdk.im/</span> <input type="text" value="" id="short_url" name="short_url" maxlength="64" />
+						<p><a href="<?php directory_path(); ?>">shorten another</a></p>
 					</div>
-					<div class="row">
-						<input type="submit" value="Shorten!" name="create_new" />
-					</div>
-				</form>
-			</div>
+					
+				</div><!-- .contents -->
+				
+			<?php
+			else : // if the form wasn't submitted, or there was an error
+			?>
+				<div class="main-header">
+					<h3>create new</h3>
+					<?php if(isset($new_message) && !empty($new_message)) echo '<div class="row"><h5 class="colorful">{ ' . $new_message . ' }</h5></div>'; ?>
+				</div>
+				<div class="contents">
+			
+					<form method="post" action="/mdk.im/public_html/">
+						<div class="row">
+							<label for="redirect_url">url to shorten <span class="required">*</span></label>
+							<input type="text" value="<?php if(isset($_POST['redirect_url'])) echo $_POST['redirect_url']; ?>" id="redirect_url" name="redirect_url" maxlength="256" required />
+						</div>
+						<div class="row">
+							<label for="redirect_url">custom short url <span class="description">(leave blank for auto-generated url)</span></label>
+							<span class="description">http://mdk.im/</span> <input type="text" value="<?php if(isset($_POST['short_url'])) echo $_POST['short_url']; ?>" id="short_url" name="short_url" maxlength="64" />
+						</div>
+						<div class="row">
+							<input type="submit" value="Shorten!" name="create_new" />
+						</div>
+					</form>
+				</div><!-- .contents -->
+			
+			<?php
+			endif; // ends if the form was submitted and no errors exist
+			?>
+			
 		</div> <!-- .main-half -->
 		
 		<div class="main-half">
